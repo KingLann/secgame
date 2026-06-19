@@ -1,0 +1,394 @@
+:root {
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --border: #e0e6ed;
+  --accent: #0077b6;
+  --accent2: #e67e22;
+  --green: #27ae60;
+  --red: #e74c3c;
+  --text: #2c3e50;
+  --dim: #7f8c8d;
+  --mono: 'Consolas', 'Courier New', monospace;
+  --sans: 'Segoe UI', system-ui, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+#app {
+  width: 100%;
+  max-width: 600px;
+  min-height: 100vh;
+}
+
+/* ===== 屏幕切换 ===== */
+.screen {
+  display: none;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* ===== 标题界面 ===== */
+#start-screen {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.logo-icon {
+  font-size: 72px;
+  margin-bottom: 16px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+#start-screen h1 {
+  font-size: 36px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.tagline {
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.sub {
+  font-size: 13px;
+  color: var(--dim);
+  margin-bottom: 30px;
+}
+
+/* ===== 按钮 ===== */
+.btn {
+  background: transparent;
+  border: 2px solid var(--border);
+  color: var(--text);
+  padding: 10px 24px;
+  font-size: 14px;
+  font-family: var(--sans);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn.primary:hover {
+  background: #0096c7;
+  border-color: #0096c7;
+}
+
+.btn.secondary {
+  border-color: var(--dim);
+  color: var(--dim);
+  font-size: 13px;
+  padding: 8px 16px;
+}
+
+.btn.secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn.small {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===== 顶部栏 ===== */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+header h2 {
+  font-size: 20px;
+  color: var(--accent);
+}
+
+.header-stats {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  font-family: var(--mono);
+}
+
+.game-header-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+#level-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+#level-progress {
+  font-size: 12px;
+  color: var(--dim);
+}
+
+/* ===== 关卡选择 ===== */
+#level-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.level-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.level-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.level-card.locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.level-card.locked:hover {
+  border-color: var(--border);
+  transform: none;
+}
+
+.level-icon {
+  font-size: 28px;
+  width: 44px;
+  text-align: center;
+}
+
+.level-meta {
+  flex: 1;
+}
+
+.level-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.level-en {
+  font-size: 12px;
+  color: var(--dim);
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+.level-desc {
+  font-size: 12px;
+  color: var(--dim);
+  margin-top: 2px;
+}
+
+.level-stars {
+  font-size: 16px;
+  color: var(--accent2);
+  letter-spacing: 2px;
+}
+
+/* ===== 游戏界面 ===== */
+.game-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 密文框 */
+.cipher-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.cipher-label {
+  font-size: 11px;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.cipher-text {
+  font-family: var(--mono);
+  font-size: 18px;
+  color: var(--accent);
+  word-break: break-all;
+  line-height: 1.6;
+  letter-spacing: 1px;
+}
+
+/* 提示框 */
+.hint-box {
+  background: rgba(230, 126, 34, 0.08);
+  border: 1px solid rgba(230, 126, 34, 0.3);
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+
+.hint-box.hidden { display: none; }
+
+.hint-label {
+  font-size: 11px;
+  color: var(--accent2);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+#hint-content {
+  font-size: 13px;
+  color: var(--accent2);
+  line-height: 1.5;
+}
+
+/* 知识卡片 */
+.knowledge-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.knowledge-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.knowledge-body {
+  font-size: 12px;
+  color: var(--dim);
+  line-height: 1.6;
+}
+
+/* 输入区域 */
+.input-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-area label {
+  font-size: 12px;
+  color: var(--dim);
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+}
+
+#answer-input {
+  flex: 1;
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: var(--text);
+  padding: 10px 14px;
+  font-size: 16px;
+  font-family: var(--mono);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+#answer-input:focus {
+  border-color: var(--accent);
+}
+
+#answer-input::placeholder {
+  color: var(--dim);
+}
+
+/* 反馈 */
+.feedback {
+  font-size: 13px;
+  min-height: 20px;
+  font-weight: 600;
+}
+
+.feedback.correct {
+  color: var(--green);
+}
+
+.feedback.wrong {
+  color: var(--red);
+}
+
+/* 底部操作 */
+.game-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  align-items: center;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 480px) {
+  .screen { padding: 12px; }
+  .cipher-text { font-size: 15px; }
+  #start-screen h1 { font-size: 28px; }
+  .logo-icon { font-size: 56px; }
+}

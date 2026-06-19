@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeBreaker - 密码破解挑战</title>
+  <link rel="stylesheet" href="/secGame/cipher/css/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 标题界面 -->
+    <div id="start-screen" class="screen active">
+      <div class="start-content">
+        <div class="logo-icon">🔐</div>
+        <h1>CodeBreaker</h1>
+        <p class="tagline">密码破解挑战</p>
+        <p class="sub">从凯撒密码到 RSA，挑战你的解密能力</p>
+        <button id="start-btn" class="btn primary">开始挑战</button>
+      </div>
+    </div>
+
+    <!-- 关卡选择 -->
+    <div id="levels-screen" class="screen">
+      <header>
+        <h2>🔐 选择挑战</h2>
+        <div class="header-stats">
+          <span>⭐ <span id="total-stars">0</span> / <span id="max-stars">0</span></span>
+          <span>🏆 <span id="total-score">0</span></span>
+        </div>
+      </header>
+      <div id="level-grid"></div>
+    </div>
+
+    <!-- 游戏界面 -->
+    <div id="game-screen" class="screen">
+      <header>
+        <button id="back-btn" class="btn small">← 返回</button>
+        <div class="game-header-info">
+          <span id="level-title"></span>
+          <span id="level-progress"></span>
+        </div>
+        <div class="header-stats">
+          <span>💡 当前可用提示数: <span id="hints-left">3</span></span>
+          <span>⭐ <span id="stars">0</span></span>
+        </div>
+      </header>
+
+      <div class="game-body">
+        <!-- 加密信息 -->
+        <div class="cipher-box">
+          <div class="cipher-label">密文</div>
+          <div id="cipher-text" class="cipher-text"></div>
+        </div>
+
+        <!-- 提示区域 -->
+        <div id="hint-box" class="hint-box hidden">
+          <div class="hint-label">💡 提示</div>
+          <div id="hint-content"></div>
+        </div>
+
+        <!-- 知识卡片 -->
+        <div id="knowledge-card" class="knowledge-card">
+          <div class="knowledge-title" id="knowledge-title"></div>
+          <div class="knowledge-body" id="knowledge-body"></div>
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="input-area">
+          <label for="answer-input">输入明文</label>
+          <div class="input-row">
+            <input type="text" id="answer-input" placeholder="输入破解结果..." autocomplete="off" spellcheck="false">
+            <button id="submit-btn" class="btn primary">提交</button>
+          </div>
+          <div id="feedback" class="feedback"></div>
+        </div>
+
+        <!-- 底部按钮 -->
+        <div class="game-actions">
+          <button id="hint-btn" class="btn secondary">💡 提示 (-1⭐)</button>
+          <button id="skip-btn" class="btn secondary">⏭ 跳过</button>
+          <div class="nav-buttons">
+            <button id="prev-btn" class="btn secondary hidden">← 上一题</button>
+            <button id="next-btn" class="btn primary hidden">下一题 →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/secGame/cipher/js/data.js"></script>
+  <script src="/secGame/cipher/js/game.js"></script>
+</body>
+</html>

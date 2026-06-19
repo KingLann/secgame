@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>暗网交易模拟 - Darkweb Transaction Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Toast 提示 -->
+  <div id="toast" class="toast"></div>
+
+  <!-- ===== 开始界面 ===== -->
+  <div id="start-screen" class="screen active">
+    <div class="start-content">
+      <div class="logo-icon">🕵️</div>
+      <h1>暗网交易模拟</h1>
+      <p class="tagline">Darkweb Transaction Tracker</p>
+      <p class="sub">追踪加密货币流向，破解暗网交易链路<br>从简单直链到混币跨链，挑战你的链上分析能力</p>
+      <button id="start-btn" class="btn primary">开始追踪</button>
+    </div>
+  </div>
+
+  <!-- ===== 关卡选择 ===== -->
+  <div id="levels-screen" class="screen">
+    <header>
+      <h2>🕵️ 选择案件</h2>
+      <div class="header-stats">
+        <span>🏆 总分: <strong id="total-score-display">0</strong></span>
+      </div>
+    </header>
+    <div id="level-grid" class="level-grid"></div>
+  </div>
+
+  <!-- ===== 游戏主界面 ===== -->
+  <div id="game-screen" class="screen">
+    <!-- 顶部栏 -->
+    <div class="game-header">
+      <div>
+        <button id="back-btn" class="btn secondary sm">← 返回</button>
+        <span id="case-title" class="case-title" style="margin-left:12px;"></span>
+      </div>
+      <div class="header-stats">
+        <span class="stat">⏱️ <span id="timer-display">0:00</span></span>
+        <span class="stat">🏆 <span id="score-display">0</span></span>
+      </div>
+    </div>
+
+    <!-- 提示条 -->
+    <div class="toolbar-hint">💡 选择节点查看详情 · 拖拽调整位置 · 标记可疑类型 · 追踪资金流向</div>
+
+    <!-- 主内容 -->
+    <div class="game-main">
+      <!-- 左侧信息面板 -->
+      <div class="side-panel">
+        <!-- 案件简介 -->
+        <div class="panel-section">
+          <h3>📋 案件简介</h3>
+          <p id="briefing-text"></p>
+        </div>
+
+        <!-- 追踪问题 -->
+        <div class="question-section">
+          <h3>🎯 追踪目标</h3>
+          <p id="question-text"></p>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="action-bar">
+          <button id="hint-btn" class="btn hint-btn">💡 获取提示 (3 次)</button>
+          <button id="trace-btn" class="btn trace-btn">🔗 追踪模式</button>
+          <button id="submit-btn" class="btn submit-btn">🎯 提交答案</button>
+        </div>
+
+        <!-- 提示面板 -->
+        <div id="hint-panel" class="hint-panel hidden">
+          <p id="hint-text"></p>
+        </div>
+
+        <!-- 追踪路径 -->
+        <div class="panel-section">
+          <h3>🔗 追踪路径</h3>
+          <div id="trace-display" class="trace-display">
+            <span class="trace-hint">点击"追踪模式"后，按顺序点击节点记录追踪路径</span>
+          </div>
+          <button id="reset-trace-btn" class="btn sm secondary" style="margin-top:8px;width:100%;display:none;">🔄 重置追踪</button>
+        </div>
+      </div>
+
+      <!-- 图形区域 -->
+      <div class="graph-area">
+        <div id="graph-container" class="graph-container"></div>
+
+        <!-- 详情面板（浮动在图上） -->
+        <div id="detail-panel" class="detail-panel">
+          <div class="detail-header-bar">🔍 节点详情</div>
+          <div class="detail-body" id="detail-content">
+            <p class="detail-hint">← 点击图中的节点查看详情</p>
+          </div>
+        </div>
+
+        <!-- 标记面板（底部浮出） -->
+        <div id="mark-panel" class="mark-panel hidden">
+          <span class="mark-label">标记为：</span>
+          <button class="mark-option" data-type="darknet">🔴 暗网市场</button>
+          <button class="mark-option" data-type="mixer">🟠 混币器/中转</button>
+          <button class="mark-option" data-type="exchange">🔵 交易所</button>
+          <button class="mark-option" data-type="personal">🟢 个人钱包</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 关卡完成弹窗 ===== -->
+  <div id="level-complete" class="modal-overlay">
+    <div class="modal-box">
+      <h2 id="complete-title"></h2>
+      <p id="complete-msg"></p>
+      <div id="complete-stats"></div>
+      <div id="knowledge-cards" class="knowledge-cards"></div>
+      <div class="modal-btns">
+        <button id="replay-btn" class="btn secondary">重新挑战</button>
+        <button id="next-case-btn" class="btn primary">下一个案件</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 最终完成界面 ===== -->
+  <div id="game-complete" class="screen">
+    <div class="final-content">
+      <div class="trophy">🏆</div>
+      <h2>所有案件已破解！</h2>
+      <p>恭喜，你已成为链上追踪专家！</p>
+      <div class="final-stats">
+        <div class="final-stat">
+          <div class="num" id="final-score">0</div>
+          <div class="label">总分</div>
+        </div>
+        <div class="final-stat">
+          <div class="num" id="final-levels">0/5</div>
+          <div class="label">破解案件</div>
+        </div>
+      </div>
+      <button id="restart-btn" class="btn primary">重新开始</button>
+    </div>
+  </div>
+
+  <script src="js/cases.js"></script>
+  <script src="js/graph.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

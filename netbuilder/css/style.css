@@ -1,0 +1,181 @@
+/* ===== NetBuilder 网络攻防沙盒 ===== */
+:root {
+  --bg: #e8edf2;
+  --bg-panel: #f5f7fa;
+  --bg-card: #ffffff;
+  --accent: #e65100;
+  --accent-dim: #bf360c;
+  --green: #2e7d32;
+  --red: #c62828;
+  --cyan: #00838f;
+  --yellow: #f9a825;
+  --text: #1a1a2e;
+  --text-dim: #37474f;
+  --border: #c5cdd6;
+  --mono: 'Consolas', 'Courier New', 'Monaco', monospace;
+}
+
+.hidden { display: none !important; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: var(--mono); font-size: 14px; min-height: 100vh; }
+#app { max-width: 1200px; margin: 0 auto; padding: 16px; min-height: 100vh; display: flex; flex-direction: column; }
+.screen { display: none; flex: 1; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* 开始界面 */
+#start-screen { justify-content: center; align-items: center; text-align: center; }
+.logo-icon { font-size: 64px; margin-bottom: 16px; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+#start-screen h1 { font-size: 28px; color: var(--accent); margin-bottom: 4px; }
+.tagline { font-size: 13px; color: var(--text-dim); margin-bottom: 8px; letter-spacing: 1px; }
+.sub { font-size: 13px; color: var(--text-dim); line-height: 1.8; max-width: 520px; margin: 0 auto 32px; }
+
+/* 按钮 */
+.btn { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 10px 24px; font-family: var(--mono); font-size: 13px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: bold; }
+.btn.primary:hover { background: var(--accent-dim); }
+.btn.sm { padding: 6px 14px; font-size: 12px; }
+
+/* 关卡列表 */
+#levels-screen header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+#levels-screen header h2 { font-size: 20px; }
+.header-stats { font-size: 13px; color: var(--accent); }
+#level-grid { display: flex; flex-direction: column; gap: 12px; }
+.level-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: all 0.25s; }
+.level-card:hover { border-color: var(--accent); transform: translateX(4px); box-shadow: -4px 0 0 var(--accent); background: #f0f4f8; }
+.level-icon { font-size: 32px; flex-shrink: 0; }
+.level-meta { flex: 1; }
+.level-name { font-size: 15px; font-weight: bold; color: var(--text); margin-bottom: 2px; }
+.level-en { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+.level-desc { display: flex; gap: 12px; font-size: 12px; color: var(--text-dim); }
+.level-desc .diff { color: var(--accent); border: 1px solid rgba(230,81,0,0.3); padding: 0 6px; border-radius: 3px; font-size: 11px; }
+.level-stars { font-size: 16px; flex-shrink: 0; letter-spacing: 2px; }
+
+/* 游戏界面 */
+#game-screen header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+#level-title { font-size: 16px; font-weight: bold; flex: 1; color: var(--text); }
+#level-difficulty { font-size: 12px; color: var(--accent); border: 1px solid rgba(230,81,0,0.3); padding: 2px 8px; border-radius: 3px; }
+
+/* 游戏布局 */
+.game-body { display: flex; gap: 12px; flex: 1; min-height: 0; }
+
+/* 左侧组件栏 */
+.component-bar {
+  width: 120px; flex-shrink: 0;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px; overflow-y: auto;
+}
+.component-bar h4 { font-size: 11px; color: var(--accent); margin-bottom: 8px; text-align: center; }
+.comp-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px 4px; margin-bottom: 6px;
+  border: 1px solid var(--border); border-radius: 6px;
+  cursor: grab; transition: all 0.2s; font-size: 10px; text-align: center;
+}
+.comp-item:hover { border-color: var(--accent); background: rgba(230,81,0,0.05); }
+.comp-item.disabled { opacity: 0.3; cursor: not-allowed; }
+.comp-item .comp-icon { font-size: 24px; }
+.comp-item .comp-name { font-size: 10px; color: var(--text-dim); }
+
+/* 中间画布 */
+.canvas-area {
+  flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  position: relative; overflow: hidden; min-height: 450px;
+  background-image: radial-gradient(circle, #ddd 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.canvas-hint {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  color: var(--text-dim); font-size: 13px; text-align: center; pointer-events: none;
+}
+
+/* 画布上的设备节点 */
+.device-node {
+  position: absolute; width: 80px; text-align: center;
+  cursor: pointer; transition: box-shadow 0.2s; z-index: 2;
+}
+.device-node:hover { z-index: 3; }
+.device-node .node-icon {
+  width: 56px; height: 56px; margin: 0 auto 4px;
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 28px; border: 2px solid var(--border); background: var(--bg-card);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.device-node.selected .node-icon { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(230,81,0,0.2); }
+.device-node .node-name { font-size: 9px; color: var(--text-dim); white-space: nowrap; }
+
+/* 连线 */
+.connection-line {
+  position: absolute; z-index: 1; pointer-events: none;
+}
+
+/* 右侧信息/配置面板 */
+.info-panel {
+  width: 240px; flex-shrink: 0;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px; overflow-y: auto; font-size: 12px;
+}
+.info-panel h4 { font-size: 12px; color: var(--accent); margin-bottom: 10px; }
+.info-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(0,0,0,0.04); }
+.info-key { color: var(--text-dim); }
+.info-val { color: var(--text); font-weight: bold; }
+
+/* 配置表单 */
+.config-group { margin-bottom: 10px; }
+.config-label { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+.config-select { width: 100%; padding: 4px 8px; font-family: var(--mono); font-size: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); }
+.config-toggle { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.toggle-switch { position: relative; width: 36px; height: 20px; cursor: pointer; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; border-radius: 10px; transition: 0.2s; }
+.toggle-slider::before { content: ''; position: absolute; width: 16px; height: 16px; left: 2px; bottom: 2px; background: #fff; border-radius: 50%; transition: 0.2s; }
+.toggle-switch input:checked + .toggle-slider { background: var(--green); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+/* 底部控制栏 */
+.control-bar {
+  display: flex; gap: 8px; margin-top: 12px; align-items: center; flex-wrap: wrap;
+}
+.control-bar .hint-text { font-size: 11px; color: var(--text-dim); flex: 1; }
+
+/* 模拟弹窗 */
+.sim-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
+  z-index: 100;
+}
+.sim-box {
+  background: var(--bg-panel); border: 2px solid var(--accent); border-radius: 12px;
+  padding: 28px; max-width: 500px; width: 90%; text-align: center;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15); animation: modalIn 0.25s ease-out;
+}
+@keyframes modalIn { from{opacity:0;transform:scale(0.92)} to{opacity:1;transform:scale(1)} }
+.sim-box h3 { color: var(--accent); margin-bottom: 12px; }
+.sim-result { font-size: 13px; line-height: 1.8; text-align: left; margin: 12px 0; }
+.sim-result .pass { color: var(--green); }
+.sim-result .fail { color: var(--red); font-weight: bold; }
+.sim-score { font-size: 28px; color: var(--accent); font-weight: bold; margin: 12px 0; }
+
+/* 知识卡片 */
+.knowledge-card { background: #f0f4f8; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 12px 0; text-align: left; }
+.knowledge-title { font-size: 14px; color: var(--accent); font-weight: bold; margin-bottom: 8px; }
+.knowledge-body { font-size: 12px; color: var(--text-dim); line-height: 1.8; }
+
+/* Toast */
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-60px); background: var(--bg-panel); border: 1px solid var(--accent); color: var(--text); padding: 10px 24px; border-radius: 6px; font-size: 13px; font-family: var(--mono); z-index: 200; transition: transform 0.3s ease; pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* 攻击选择弹窗 */
+.attack-select { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+.attack-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.attack-option:hover { border-color: var(--accent); }
+.attack-option .atk-icon { font-size: 24px; }
+.attack-option .atk-name { font-weight: bold; font-size: 13px; }
+.attack-option .atk-desc { font-size: 11px; color: var(--text-dim); }
+
+@media (max-width: 800px) {
+  .game-body { flex-direction: column; }
+  .component-bar { width: 100%; flex-direction: row; display: flex; gap: 8px; overflow-x: auto; }
+  .info-panel { width: 100%; }
+}

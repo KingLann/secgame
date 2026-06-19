@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetBuilder - 网络攻防沙盒</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="toast" class="toast"></div>
+
+    <!-- 开始界面 -->
+    <div id="start-screen" class="screen active">
+      <div style="text-align:center;">
+        <div class="logo-icon">🏗️</div>
+        <h1>NetBuilder</h1>
+        <p class="tagline">网络攻防沙盒</p>
+        <p class="sub">
+          拖拽搭建网络拓扑，配置安全设备，<br>
+          然后模拟攻击测试你的防御体系
+        </p>
+        <button id="start-btn" class="btn primary">[ 开始搭建 ]</button>
+      </div>
+    </div>
+
+    <!-- 关卡选择 -->
+    <div id="levels-screen" class="screen">
+      <header>
+        <div><h2>🏗️ 选择关卡</h2></div>
+        <div><span class="header-stats">🏆 <strong id="total-score">0</strong></span></div>
+      </header>
+      <div id="level-grid"></div>
+    </div>
+
+    <!-- 游戏界面 -->
+    <div id="game-screen" class="screen">
+      <header>
+        <button id="back-btn" class="btn sm">← 返回</button>
+        <span id="level-title"></span>
+        <span id="level-difficulty"></span>
+      </header>
+
+      <div class="game-body">
+        <!-- 左侧组件栏 -->
+        <div class="component-bar" id="component-bar">
+          <h4>📦 组件</h4>
+          <div id="comp-list"></div>
+        </div>
+
+        <!-- 中间画布 -->
+        <div class="canvas-area" id="canvas-area">
+          <div class="canvas-hint" id="canvas-hint">从左侧拖拽组件到这里搭建网络</div>
+          <svg id="connections-svg" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;"></svg>
+        </div>
+
+        <!-- 右侧信息面板 -->
+        <div class="info-panel" id="info-panel">
+          <h4>📋 关卡信息</h4>
+          <div id="level-info"></div>
+          <div id="device-config" class="hidden"></div>
+        </div>
+      </div>
+
+      <!-- 底部控制栏 -->
+      <div class="control-bar">
+        <button id="simulate-btn" class="btn primary">⚡ 模拟攻击</button>
+        <button id="clear-btn" class="btn">🗑️ 清空画布</button>
+        <button id="connect-btn" class="btn">🔗 连线模式</button>
+        <span class="hint-text" id="hint-text"></span>
+      </div>
+    </div>
+
+    <!-- 模拟结果弹窗 -->
+    <div id="sim-overlay" class="sim-overlay hidden">
+      <div class="sim-box">
+        <h3 id="sim-title">⚡ 模拟结果</h3>
+        <div class="sim-result" id="sim-result"></div>
+        <div class="sim-score" id="sim-score"></div>
+        <div class="knowledge-card">
+          <div class="knowledge-title" id="knowledge-title"></div>
+          <div class="knowledge-body" id="knowledge-body"></div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;">
+          <button id="sim-close-btn" class="btn">继续搭建</button>
+          <button id="sim-next-btn" class="btn primary">下一关 →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 攻击选择弹窗 -->
+    <div id="attack-overlay" class="sim-overlay hidden">
+      <div class="sim-box">
+        <h3>⚡ 选择攻击类型</h3>
+        <div class="attack-select" id="attack-select"></div>
+        <button id="attack-cancel-btn" class="btn" style="margin-top:12px;">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

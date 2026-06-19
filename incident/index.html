@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IncidentResp - 安全事件应急响应</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="toast" class="toast"></div>
+
+    <!-- ===== 开始界面 ===== -->
+    <div id="start-screen" class="screen active">
+      <div style="text-align:center;">
+        <div class="logo-icon">🚨</div>
+        <h1>IncidentResp</h1>
+        <p class="tagline">安全事件应急响应</p>
+        <p class="sub">
+          扮演 SOC 分析师，面对突发安全事件<br>
+          在有限时间内完成事件分级、调查分析、威胁遏制和恢复处置
+        </p>
+        <button id="start-btn" class="btn primary">[ 进入 SOC ]</button>
+      </div>
+    </div>
+
+    <!-- ===== 关卡选择 ===== -->
+    <div id="levels-screen" class="screen">
+      <header>
+        <div><h2>🚨 选择事件</h2></div>
+        <div>
+          <span class="header-stats">🏆 <strong id="total-score">0</strong></span>
+        </div>
+      </header>
+      <div id="level-grid"></div>
+    </div>
+
+    <!-- ===== 游戏界面 ===== -->
+    <div id="game-screen" class="screen">
+      <header>
+        <button id="back-btn" class="btn sm">← 返回</button>
+        <span id="level-title"></span>
+        <span id="level-difficulty"></span>
+      </header>
+
+      <div class="game-layout">
+        <!-- 左侧：事件面板 -->
+        <div class="incident-panel">
+          <div class="panel-title">📋 告警信息</div>
+          <div class="alert-card" id="alert-card"></div>
+          <div class="timeline-title">⏱️ 事件时间线</div>
+          <div class="timeline" id="timeline"></div>
+        </div>
+
+        <!-- 右侧：答题区 -->
+        <div class="question-panel">
+          <div class="question-progress" id="question-progress"></div>
+          <div class="question-text" id="question-text"></div>
+          <div class="options-container" id="options-container"></div>
+          <div class="feedback-box hidden" id="feedback-box">
+            <div class="feedback-title" id="feedback-title"></div>
+            <div class="feedback-explain" id="feedback-explain"></div>
+          </div>
+          <div class="question-actions">
+            <button id="submit-btn" class="btn primary" style="width:100%;">确认判断</button>
+            <button id="next-btn" class="btn primary" style="width:100%;display:none;">下一题 →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 关卡完成弹窗 ===== -->
+    <div id="level-complete" class="modal-overlay hidden">
+      <div class="modal-box">
+        <h2 id="complete-title"></h2>
+        <p id="complete-msg"></p>
+        <div id="complete-stars"></div>
+        <div class="knowledge-card">
+          <div class="knowledge-title" id="knowledge-title"></div>
+          <div class="knowledge-body" id="knowledge-body"></div>
+        </div>
+        <div class="modal-btns">
+          <button id="replay-btn" class="btn">重新挑战</button>
+          <button id="next-level-btn" class="btn primary">下一关 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberHack - 渗透测试模拟器</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 矩阵雨背景 -->
+  <canvas id="matrix-bg"></canvas>
+
+  <!-- 主容器 -->
+  <div id="app">
+    <!-- 顶部栏 -->
+    <header id="header">
+      <div class="header-left">
+        <span class="logo">⚡ CyberHack</span>
+        <span class="subtitle">渗透测试模拟器</span>
+      </div>
+      <div class="header-right">
+        <span class="score">得分: <span id="score">0</span></span>
+        <span class="level">关卡: <span id="current-level">0</span>/6</span>
+      </div>
+    </header>
+
+    <!-- 开始界面 -->
+    <div id="start-screen" class="screen active">
+      <div class="start-content">
+        <pre class="ascii-art">
+ ██████╗██╗   ██╗██████╗ ███████╗██████╗ ██╗  ██╗ █████╗  ██████╗██╗  ██╗
+██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██║  ██║██╔══██╗██╔════╝██║ ██╔╝
+██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝███████║███████║██║     █████╔╝
+██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗██╔══██║██╔══██║██║     ██╔═██╗
+╚██████╗   ██║   ██████╔╝███████╗██║  ██║██║  ██║██║  ██║╚██████╗██║  ██╗
+ ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
+        </pre>
+        <p class="tagline">> 欢迎，特工。你的任务是渗透目标系统，获取 flag 证明你的实力。</p>
+        <p class="tagline typing-delay">> 准备好了吗？</p>
+        <button id="start-btn" class="glow-btn">[ 开始任务 ]</button>
+        <div class="start-hint">
+          <p>💡 输入 <code>help</code> 查看可用命令</p>
+          <p>💡 输入 <code>hint</code> 获取提示（扣 50 分）</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 游戏主界面 -->
+    <div id="game-screen" class="screen">
+      <!-- 任务面板 -->
+      <aside id="mission-panel">
+        <div class="panel-section">
+          <h3>📋 当前任务</h3>
+          <div id="mission-brief">加载中...</div>
+        </div>
+        <div class="panel-section">
+          <h3>🎯 目标</h3>
+          <div id="mission-target">-</div>
+        </div>
+        <div class="panel-section">
+          <h3>💡 提示</h3>
+          <div id="mission-hint">输入 hint 获取提示</div>
+        </div>
+        <div class="panel-section">
+          <h3>🏆 成就</h3>
+          <div id="achievements">暂无成就</div>
+        </div>
+      </aside>
+
+      <!-- 终端 -->
+      <div id="terminal-wrapper">
+        <div id="terminal">
+          <div id="terminal-output"></div>
+          <div id="terminal-input-line">
+            <span class="prompt">visitor@cyberhack:~$</span>
+            <input type="text" id="terminal-input" autofocus autocomplete="off" spellcheck="false">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 关卡完成弹窗 -->
+    <div id="level-complete-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="success-animation">
+          <div class="checkmark">✓</div>
+        </div>
+        <h2>任务完成！</h2>
+        <p id="level-complete-msg"></p>
+        <div id="level-stats"></div>
+        <div class="modal-btns">
+          <button id="stay-btn" class="glow-btn secondary">[ 留在当前关 ]</button>
+          <button id="next-level-btn" class="glow-btn">[ 下一关 ]</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 游戏通关弹窗 -->
+    <div id="game-complete-modal" class="modal hidden">
+      <div class="modal-content">
+        <pre class="ascii-art small">
+🏆 ALL MISSIONS COMPLETE 🏆
+        </pre>
+        <h2>恭喜，特工！</h2>
+        <p>你已完成所有渗透任务。</p>
+        <div id="final-stats"></div>
+        <button id="restart-btn" class="glow-btn">[ 重新开始 ]</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/effects.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/terminal.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

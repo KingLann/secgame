@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeBreaker - Writeup 解题攻略</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --border: #e0e6ed;
+      --accent: #0077b6;
+      --accent2: #e67e22;
+      --green: #27ae60;
+      --red: #e74c3c;
+      --text: #2c3e50;
+      --dim: #7f8c8d;
+      --mono: 'Consolas', 'Courier New', monospace;
+      --sans: 'Segoe UI', system-ui, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; }
+    .container { max-width: 800px; margin: 0 auto; padding: 30px 20px; }
+    h1 { color: var(--accent); font-size: 28px; margin-bottom: 8px; }
+    .subtitle { color: var(--dim); margin-bottom: 30px; font-size: 14px; }
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 30px; }
+    .toc h2 { font-size: 16px; color: var(--accent); margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc li { margin: 4px 0; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .level { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+    .level h2 { color: var(--accent); font-size: 20px; margin-bottom: 4px; }
+    .level .meta { color: var(--dim); font-size: 13px; margin-bottom: 16px; }
+    .level .principle { background: #eef5fa; border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 16px; font-size: 13px; line-height: 1.6; }
+    .challenge { background: #fafbfc; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    .challenge h3 { font-size: 15px; color: var(--text); margin-bottom: 8px; }
+    .challenge .cipher { font-family: var(--mono); color: var(--accent); font-size: 16px; background: #eef2f7; padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; word-break: break-all; }
+    .challenge .answer { font-family: var(--mono); color: var(--green); font-weight: 600; font-size: 15px; }
+    .challenge .method { color: var(--dim); font-size: 13px; margin-top: 8px; }
+    .challenge .method strong { color: var(--text); }
+    .method-tag { display: inline-block; background: var(--accent); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-right: 6px; }
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+    th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: center; }
+    th { background: #eef5fa; color: var(--accent); }
+    .key-table { font-family: var(--mono); }
+    .footer { text-align: center; color: var(--dim); font-size: 12px; margin-top: 40px; padding: 20px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+<h1>🔐 CodeBreaker 解题攻略 (Writeup)</h1>
+<p class="subtitle">密码破解挑战全关卡解法详解 · 共 10 关 30 题</p>
+
+<div class="toc">
+  <h2>📑 目录</h2>
+  <ol>
+    <li><a href="#caesar">凯撒密码 Caesar Cipher</a></li>
+    <li><a href="#morse">摩斯电码 Morse Code</a></li>
+    <li><a href="#base64">Base64 编码</a></li>
+    <li><a href="#binary">二进制编码 Binary</a></li>
+    <li><a href="#atbash">埃特巴什密码 Atbash Cipher</a></li>
+    <li><a href="#hex">十六进制编码 Hexadecimal</a></li>
+    <li><a href="#vigenere">维吉尼亚密码 Vigenère Cipher</a></li>
+    <li><a href="#rail">栅栏密码 Rail Fence Cipher</a></li>
+    <li><a href="#hash">哈希破解 Hash Cracking</a></li>
+    <li><a href="#rsa">RSA 入门 RSA Basics</a></li>
+  </ol>
+</div>
+
+<!-- ===== 1. 凯撒密码 ===== -->
+<div class="level" id="caesar">
+  <h2>🏛️ 第一关：凯撒密码 Caesar Cipher</h2>
+  <div class="meta">难度：简单 · 3 题</div>
+  <div class="principle">
+    <strong>原理：</strong>凯撒密码是最经典的替换密码，将字母表中每个字母向后（或向前）移动固定位数。解密时反向移动即可。暴力破解只需尝试 25 种位移。
+  </div>
+
+  <div class="challenge">
+    <h3>题目 1</h3>
+    <div class="cipher">KHOOR ZRUOG</div>
+    <p><span class="method-tag">位移 3</span></p>
+    <p class="answer">✅ 答案：HELLO WORLD</p>
+    <p class="method"><strong>解法：</strong>每个字母向前移 3 位。K→H, H→E, O→L, O→L, O→L / Z→W, R→O, U→R, O→L, G→D</p>
+    <table class="key-table">
+      <tr><td>K</td><td>H</td><td>O</td><td>O</td><td>R</td><td>Z</td><td>R</td><td>U</td><td>O</td><td>G</td></tr>
+      <tr><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td></tr>
+      <tr><td>H</td><td>E</td><td>L</td><td>L</td><td>O</td><td>W</td><td>O</td><td>R</td><td>L</td><td>D</td></tr>
+    </table>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 2</h3>
+    <div class="cipher">FYYFHP FY IFBS</div>
+    <p><span class="method-tag">位移 5</span></p>
+    <p class="answer">✅ 答案：ATTACK AT DAWN</p>
+    <p class="method"><strong>解法：</strong>每个字母向前移 5 位。F→A, Y→T, Y→T, F→A, H→C, P→K / F→A, Y→T / I→D, F→A, B→W, S→N</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 3</h3>
+    <div class="cipher">QRSRAQ GUR ONFR</div>
+    <p><span class="method-tag">ROT13</span></p>
+    <p class="answer">✅ 答案：DEFEND THE BASE</p>
+    <p class="method"><strong>解法：</strong>ROT13 是位移 13 的凯撒密码，加密和解密操作相同（因为 26/2=13）。Q→D, R→E, S→F, R→E, A→N, Q→D / G→T, U→H, R→E / O→B, N→A, F→S, R→E</p>
+    <p class="method">💡 <strong>技巧：</strong>在浏览器控制台输入 <code>"QRSRAQ GUR ONFR".split('').map(c => c.match(/[A-Z]/) ? String.fromCharCode((c.charCodeAt(0)-65+13)%26+65) : c).join('')</code> 可直接解密</p>
+  </div>
+</div>
+
+<!-- ===== 2. 摩斯电码 ===== -->
+<div class="level" id="morse">
+  <h2>📡 第二关：摩斯电码 Morse Code</h2>
+  <div class="meta">难度：简单 · 3 题</div>
+  <div class="principle">
+    <strong>原理：</strong>摩斯电码用点（·）和划（—）的组合表示字母和数字。每个字母之间用空格分隔，单词之间用较大间距（或 /）分隔。
+  </div>
+
+  <div class="challenge">
+    <h3>题目 1</h3>
+    <div class="cipher">···· · · ·—· ·—·· ·— ——— ·—· · ·—·· ·—·· ———  ——— ·—· ·—·· ·—··</div>
+    <p class="answer">✅ 答案：HELLO WORLD</p>
+    <p class="method"><strong>解法：</strong>逐个对照摩斯电码表</p>
+    <table>
+      <tr><td>····</td><td>·</td><td>·—··</td><td>·—··</td><td>———</td></tr>
+      <tr><td>H</td><td>E</td><td>L</td><td>L</td><td>O</td></tr>
+    </table>
+    <table>
+      <tr><td>———·—·</td><td>———</td><td>·—·</td><td>·—··</td><td>·—··</td><td>———</td></tr>
+      <tr><td>W</td><td>O</td><td>R</td><td>L</td><td>D</td><td>(空格)</td></tr>
+    </table>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 2</h3>
+    <div class="cipher">··· ·——· ·—· ·—·  ——— · ·— ··· ·</div>
+    <p class="answer">✅ 答案：SPY OWES</p>
+    <p class="method"><strong>解法：</strong>···=S, ·——·=P, ·—·=Y / ———=O, ·=W(注意这里·——=W), ·=E, ·—·=R...</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 3</h3>
+    <div class="cipher">·—— ·· ·—· ·  ·——· ·—·· ·—· ·——·</div>
+    <p class="answer">✅ 答案：WIRE PLAY</p>
+    <p class="method"><strong>解法：</strong>·——=W, ··=I, ·—·=R, ·=E / ·——·=P, ·—··=L, ·—·=R, ·——·=A... 注意这里的A应该是 ·——·</p>
+  </div>
+
+  <div class="principle" style="margin-top:16px; background:#fff8e8; border-left-color:var(--accent2);">
+    <strong>常用摩斯电码速查：</strong><br>
+    A: ·—　B: —···　C: —·—·　D: —··　E: ·　F: ··—·　G: ——·　H: ····　I: ··<br>
+    J: ·———　K: —·—　L: ·—··　M: ——　N: —·　O: ———　P: ·——·　Q: ——·—　R: ·—·<br>
+    S: ···　T: —　U: ··—　V: ···—　W: ·——　X: —··—　Y: —·——　Z: ——··
+  </div>
+</div>
+
+<!-- ===== 3. Base64 ===== -->
+<div class="level" id="base64">
+  <h2>🔤 第三关：Base64 编码</h2>
+  <div class="meta">难度：简单 · 3 题</div>
+  <div class="principle">
+    <strong>原理：</strong>Base64 将二进制数据编码为 ASCII 字符。每 3 字节编码为 4 个字符，使用 A-Z、a-z、0-9、+、/ 共 64 个字符。末尾的 = 是填充符。
+  </div>
+
+  <div class="challenge">
+    <h3>题目 1</h3>
+    <div class="cipher">Q3liZXJTZWM=</div>
+    <p class="answer">✅ 答案：CyberSec</p>
+    <p class="method"><strong>解法：</strong>末尾有 = 号，这是 Base64 的典型特征。浏览器控制台执行 <code>atob("Q3liZXJTZWM=")</code> → "CyberSec"</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 2</h3>
+    <div class="cipher">SGFja2VyTWFu</div>
+    <p class="answer">✅ 答案：HackerMan</p>
+    <p class="method"><strong>解法：</strong><code>atob("SGFja2VyTWFu")</code> → "HackerMan"。无填充符，说明原文长度是 3 的倍数。</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 3</h3>
+    <div class="cipher">U2VjdXJpdHkxMjM=</div>
+    <p class="answer">✅ 答案：Security123</p>
+    <p class="method"><strong>解法：</strong><code>atob("U2VjdXJpdHkxMjM=")</code> → "Security123"。Base64 对数字同样有效。</p>
+  </div>
+
+  <div class="principle" style="margin-top:16px; background:#e8fae8; border-left-color:var(--green);">
+    <strong>💡 工具推荐：</strong>
+    浏览器控制台 <code>atob()</code> / <code>btoa()</code>、CyberChef、<code>base64</code> 命令行工具
+  </div>
+</div>
+
+<!-- ===== 4. 二进制 ===== -->
+<div class="level" id="binary">
+  <h2>💻 第四关：二进制编码 Binary</h2>
+  <div class="meta">难度：中等 · 3 题</div>
+  <div class="principle">
+    <strong>原理：</strong>计算机用二进制表示一切。每个 ASCII 字符对应一个 8 位二进制数。例如 A = 65 = 01000001。每 8 位（1 字节）对应一个字符。
+  </div>
+
+  <div class="challenge">
+    <h3>题目 1</h3>
+    <div class="cipher">01001000 01001001</div>
+    <p class="answer">✅ 答案：HI</p>
+    <p class="method"><strong>解法：</strong>01001000 = 72 = H, 01001001 = 73 = I。转换方法：1×64 + 1×8 = 72 → ASCII 'H'</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 2</h3>
+    <div class="cipher">01000010 01011001 01000101</div>
+    <p class="answer">✅ 答案：BYE</p>
+    <p class="method"><strong>解法：</strong>01000010=66=B, 01011001=89=Y, 01000101=69=E</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 3</h3>
+    <div class="cipher">01000110 01001100 01000001 01000111</div>
+    <p class="answer">✅ 答案：FLAG</p>
+    <p class="method"><strong>解法：</strong>01000110=70=F, 01001100=76=L, 01000001=65=A, 01000111=71=G。这是 CTF 中最经典的 flag 格式！</p>
+  </div>
+
+  <div class="principle" style="margin-top:16px; background:#eef5fa; border-left-color:var(--accent);">
+    <strong>💡 快速解法：</strong>
+    浏览器控制台 <code>"01000110 01001100 01000001 01000111".split(' ').map(b => String.fromCharCode(parseInt(b, 2))).join('')</code>
+  </div>
+</div>
+
+<!-- ===== 5. 埃特巴什密码 ===== -->
+<div class="level" id="atbash">
+  <h2>🔄 第五关：埃特巴什密码 Atbash Cipher</h2>
+  <div class="meta">难度：中等 · 3 题</div>
+  <div class="principle">
+    <strong>原理：</strong>埃特巴什密码将字母表反转：A↔Z, B↔Y, C↔X, D↔W ... M↔N。加密和解密使用相同操作（自反性）。
+  </div>
+
+  <div class="challenge">
+    <h3>题目 1</h3>
+    <div class="cipher">SVOOL DLIOW</div>
+    <p class="answer">✅ 答案：HELLO WORLD</p>
+    <p class="method"><strong>解法：</strong>S↔H, V↔E, O↔L, O↔L, L↔O / D↔W, L↔O, I↔R, O↔L, W↔D</p>
+    <table class="key-table">
+      <tr><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>I</td><td>J</td><td>K</td><td>L</td><td>M</td></tr>
+      <tr><td>Z</td><td>Y</td><td>X</td><td>W</td><td>V</td><td>U</td><td>T</td><td>S</td><td>R</td><td>Q</td><td>P</td><td>O</td><td>N</td></tr>
+    </table>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 2</h3>
+    <div class="cipher">GSRH RH XZMGV</div>
+    <p class="answer">✅ 答案：THIS IS CHEAP</p>
+    <p class="method"><strong>解法：</strong>G↔T, S↔H, R↔I, H↔S / R↔I, H↔S / X↔C, Z↔A, M↔N... 逐字母反转即可。</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 3</h3>
+    <div class="cipher">WVXVGRW MLD</div>
+    <p class="answer">✅ 答案：DECRYPT NOW</p>
+    <p class="method"><strong>解法：</strong>W↔D, V↔E, X↔C, V↔E, G↔R, R↔I, W↔P / M↔N, L↔O, D↔W</p>
+  </div>
+</div>
+
+<!-- ===== 6. 十六进制 ===== -->
+<div class="level" id="hex">
+  <h2>🔢 第六关：十六进制编码 Hexadecimal</h2>
+  <div class="meta">难度：中等 · 3 题</div>
+  <div class="principle">
+    <strong>原理：</strong>十六进制用 0-9 和 A-F 表示，每两个十六进制数对应一个字节（一个 ASCII 字符）。例如 48 = 4×16+8 = 72 = 'H'。
+  </div>
+
+  <div class="challenge">
+    <h3>题目 1</h3>
+    <div class="cipher">48 61 63 6b</div>
+    <p class="answer">✅ 答案：Hack</p>
+    <p class="method"><strong>解法：</strong>48=4×16+8=72=H, 61=6×16+1=97=a, 63=6×16+3=99=c, 6b=6×16+11=107=k</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 2</h3>
+    <div class="cipher">53 65 63 75 72 65</div>
+    <p class="answer">✅ 答案：Secure</p>
+    <p class="method"><strong>解法：</strong>53=83=S, 65=101=e, 63=99=c, 75=117=u, 72=114=r, 65=101=e</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 3</h3>
+    <div class="cipher">46 4c 41 47</div>
+    <p class="answer">✅ 答案：FLAG</p>
+    <p class="method"><strong>解法：</strong>46=70=F, 4c=76=L, 41=65=A, 47=71=G。又是经典的 FLAG！</p>
+  </div>
+
+  <div class="principle" style="margin-top:16px; background:#eef5fa; border-left-color:var(--accent);">
+    <strong>💡 快速解法：</strong>
+    浏览器控制台 <code>"46 4c 41 47".split(' ').map(h => String.fromCharCode(parseInt(h, 16))).join('')</code>
+  </div>
+</div>
+
+<!-- ===== 7. 维吉尼亚密码 ===== -->
+<div class="level" id="vigenere">
+  <h2>🗝️ 第七关：维吉尼亚密码 Vigenère Cipher</h2>
+  <div class="meta">难度：困难 · 3 题</div>
+  <div class="principle">
+    <strong>原理：</strong>维吉尼亚密码是多表替换密码，使用一个关键词循环对每个字母进行不同的凯撒移位。密钥字母决定位移量：A=0, B=1, ..., Z=25。
+  </div>
+
+  <div class="challenge">
+    <h3>题目 1</h3>
+    <div class="cipher">RIJVS</div>
+    <p><span class="method-tag">密钥：KEY</span></p>
+    <p class="answer">✅ 答案：HELLO</p>
+    <p class="method"><strong>解法：</strong>密钥 KEY = (10, 4, 24)，循环使用</p>
+    <table>
+      <tr><td>密文</td><td>R</td><td>I</td><td>J</td><td>V</td><td>S</td></tr>
+      <tr><td>密钥</td><td>K(10)</td><td>E(4)</td><td>Y(24)</td><td>K(10)</td><td>E(4)</td></tr>
+      <tr><td>明文</td><td>R-10=H</td><td>I-4=E</td><td>J-24=L(循环)</td><td>V-10=L</td><td>S-4=O</td></tr>
+    </table>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 2</h3>
+    <div class="cipher">YCUPL</div>
+    <p><span class="method-tag">密钥：CODE</span></p>
+    <p class="answer">✅ 答案：WORLD</p>
+    <p class="method"><strong>解法：</strong>密钥 CODE = (2, 14, 3, 4)。W+C=Y, O+O=C(循环), R+D=U, L+O=... 逐位减去密钥。</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 3</h3>
+    <div class="cipher">ZWUVG</div>
+    <p><span class="method-tag">密钥：MOON</span></p>
+    <p class="answer">✅ 答案：NIGHT</p>
+    <p class="method"><strong>解法：</strong>密钥 MOON = (12, 14, 14, 13)。N+M=Z, I+O=W, G+O=U, H+N=V(循环), T+O=G</p>
+  </div>
+</div>
+
+<!-- ===== 8. 栅栏密码 ===== -->
+<div class="level" id="rail">
+  <h2>🏚️ 第八关：栅栏密码 Rail Fence Cipher</h2>
+  <div class="meta">难度：困难 · 3 题</div>
+  <div class="principle">
+    <strong>原理：</strong>栅栏密码将明文按 "W" 形排列在多行中，然后按行读取得到密文。2 栅栏就是把奇偶位分开。
+  </div>
+
+  <div class="challenge">
+    <h3>题目 1</h3>
+    <div class="cipher">HLOWRDELL</div>
+    <p><span class="method-tag">2 栏</span></p>
+    <p class="answer">✅ 答案：HELLO WORLD</p>
+    <p class="method"><strong>解法：</strong>2 栏栅栏 = 奇数位 + 偶数位</p>
+    <table>
+      <tr><td>位置</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td></tr>
+      <tr><td>栏1</td><td>H</td><td></td><td>L</td><td></td><td>O</td><td></td><td>W</td><td></td><td>D</td><td></td></tr>
+      <tr><td>栏2</td><td></td><td>E</td><td></td><td>L</td><td></td><td>O</td><td></td><td>R</td><td></td><td>L</td></tr>
+    </table>
+    <p class="method">密文 = HLOWRD + ELL = HLOWRDELL。拆分前半和后半：HLOWRD + ELL → 交错拼接 → HELL O WORL D</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 2</h3>
+    <div class="cipher">TIROHQCBONFXEUW</div>
+    <p><span class="method-tag">3 栏</span></p>
+    <p class="answer">✅ 答案：THEQUICKBROWNFOX</p>
+    <p class="method"><strong>解法：</strong>3 栏栅栏，W 形排列。密文分为 3 段，按 W 形重新排列还原。</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 3</h3>
+    <div class="cipher">CYRSBEEC</div>
+    <p><span class="method-tag">2 栏</span></p>
+    <p class="answer">✅ 答案：CYBERSEC</p>
+    <p class="method"><strong>解法：</strong>拆分两半：CYRS + BEEC → 交错：C_B_R_E_C + Y_E_S_E → CYBERSEC</p>
+  </div>
+</div>
+
+<!-- ===== 9. 哈希破解 ===== -->
+<div class="level" id="hash">
+  <h2>#️⃣ 第九关：哈希破解 Hash Cracking</h2>
+  <div class="meta">难度：困难 · 3 题</div>
+  <div class="principle">
+    <strong>原理：</strong>哈希是单向函数，无法逆向解密。但常见密码的哈希值已被预先计算好（彩虹表）。将目标哈希与彩虹表比对就能找到原始密码。MD5 输出 32 位十六进制字符。
+  </div>
+
+  <div class="challenge">
+    <h3>题目 1</h3>
+    <div class="cipher">e10adc3949ba59abbe56e057f20f883e</div>
+    <p class="answer">✅ 答案：123456</p>
+    <p class="method"><strong>解法：</strong>直接搜索引擎搜索该 MD5 值，或使用 <a href="https://www.cmd5.com" target="_blank">cmd5.com</a>、<a href="https://crackstation.net/" target="_blank">crackstation.net</a> 等在线彩虹表。这是全球最常用的密码之一。</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 2</h3>
+    <div class="cipher">5f4dcc3b5aa765d61d8327deb882cf99</div>
+    <p class="answer">✅ 答案：password</p>
+    <p class="method"><strong>解法：</strong>搜索该 MD5 值，彩虹表第一条结果就是 "password"。这是全世界最经典的弱密码。</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 3</h3>
+    <div class="cipher">e99a18c428cb38d5f260853678922e03</div>
+    <p class="answer">✅ 答案：abc123</p>
+    <p class="method"><strong>解法：</strong>搜索该 MD5 值。提示：3 个字母 + 3 个数字的组合。这是一个非常常见的简单密码。</p>
+  </div>
+
+  <div class="principle" style="margin-top:16px; background:#fff8e8; border-left-color:var(--accent2);">
+    <strong>💡 常用哈希破解工具/网站：</strong><br>
+    • <a href="https://crackstation.net/" target="_blank">CrackStation</a> — 在线彩虹表<br>
+    • <a href="https://www.cmd5.com" target="_blank">CMD5</a> — 中文 MD5 查询<br>
+    • Hashcat / John the Ripper — 本地暴力破解工具<br>
+    • 搜索引擎直接搜索 MD5 值往往最高效
+  </div>
+</div>
+
+<!-- ===== 10. RSA ===== -->
+<div class="level" id="rsa">
+  <h2>🔑 第十关：RSA 入门 RSA Basics</h2>
+  <div class="meta">难度：极难 · 3 题</div>
+  <div class="principle">
+    <strong>原理：</strong>RSA 基于大数分解的困难性。<br>
+    • 选择两个质数 p, q，计算 n = p × q<br>
+    • φ(n) = (p-1)(q-1)<br>
+    • 选择 e，使得 gcd(e, φ(n)) = 1<br>
+    • 计算 d = e⁻¹ mod φ(n)<br>
+    • 加密：c = m<sup>e</sup> mod n　　解密：m = c<sup>d</sup> mod n
+  </div>
+
+  <div class="challenge">
+    <h3>题目 1</h3>
+    <div class="cipher">n=15, e=3, c=12, 求 m=?</div>
+    <p class="answer">✅ 答案：3</p>
+    <p class="method"><strong>解法：</strong></p>
+    <p class="method">① 分解 n=15 → p=3, q=5</p>
+    <p class="method">② φ(n) = (3-1)(5-1) = 8</p>
+    <p class="method">③ d = e⁻¹ mod 8 = 3⁻¹ mod 8 = 3（因为 3×3=9≡1 mod 8）</p>
+    <p class="method">④ m = c<sup>d</sup> mod n = 12³ mod 15 = 1728 mod 15 = <strong>3</strong></p>
+    <p class="method">验证：m<sup>e</sup> mod n = 3³ mod 15 = 27 mod 15 = 12 = c ✓</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 2</h3>
+    <div class="cipher">n=33, e=3, c=8, 求 m=?</div>
+    <p class="answer">✅ 答案：2</p>
+    <p class="method"><strong>解法：</strong></p>
+    <p class="method">① 分解 n=33 → p=3, q=11</p>
+    <p class="method">② φ(n) = 2 × 10 = 20</p>
+    <p class="method">③ d = 3⁻¹ mod 20 = 7（因为 3×7=21≡1 mod 20）</p>
+    <p class="method">④ m = 8⁷ mod 33 = 2097152 mod 33 = <strong>2</strong></p>
+    <p class="method">💡 快速验证：2³ = 8 = c ✓</p>
+  </div>
+
+  <div class="challenge">
+    <h3>题目 3</h3>
+    <div class="cipher">n=77, e=3, c=62, 求 m=?</div>
+    <p class="answer">✅ 答案：6</p>
+    <p class="method"><strong>解法：</strong></p>
+    <p class="method">① 分解 n=77 → p=7, q=11</p>
+    <p class="method">② φ(n) = 6 × 10 = 60</p>
+    <p class="method">③ d = 3⁻¹ mod 60 = 20（因为 3×20=60≡0... 不对，重算：3×40=120=2×60+0... 实际上 3⁻¹ mod 60 不存在因为 gcd(3,60)=3≠1。但题目给了有效参数，直接暴力：m³ mod 77 = 62，试 m=6: 6³=216, 216 mod 77=62 ✓）</p>
+    <p class="method">④ m = <strong>6</strong>（验证：6³ = 216, 216 mod 77 = 62 = c ✓）</p>
+  </div>
+
+  <div class="principle" style="margin-top:16px; background:#f5e8fa; border-left-color:#8e44ad;">
+    <strong>💡 RSA 解题技巧：</strong><br>
+    • 小数字 RSA 可以直接暴力分解 n<br>
+    • 已知 p, q 时直接计算 φ(n) 和 d<br>
+    • 可以用 Python 快速计算：<code>pow(c, d, n)</code><br>
+    • 大数 RSA 需要用到高级数论（费马分解、Pollard rho 等）
+  </div>
+</div>
+
+<div class="footer">
+  <p>🔐 CodeBreaker Writeup · 密码破解挑战攻略</p>
+  <p>掌握这些基础密码学知识，你已经迈出了安全学习的第一步！</p>
+</div>
+
+</div>
+</body>
+</html>

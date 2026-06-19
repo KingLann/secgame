@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecArena - 网络安全挑战平台</title>
+  <style>
+    /* ===== 全局变量 ===== */
+    :root {
+      --bg: #0f1923;
+      --bg-card: rgba(18, 30, 45, 0.9);
+      --green: #00ff41;
+      --green-dim: #00cc33;
+      --cyan: #00e5ff;
+      --red: #ff1744;
+      --yellow: #ffd600;
+      --purple: #d500f9;
+      --orange: #ff9100;
+      --text: #e2eaf0;
+      --text-dim: #8a9bb0;
+      --border: rgba(0, 255, 65, 0.2);
+      --glow-green: 0 0 20px rgba(0, 255, 65, 0.3);
+      --glow-cyan: 0 0 20px rgba(0, 229, 255, 0.3);
+      --glow-red: 0 0 20px rgba(255, 23, 68, 0.3);
+      --glow-purple: 0 0 20px rgba(213, 0, 249, 0.3);
+      --font-mono: 'Consolas', 'Courier New', 'Monaco', monospace;
+    }
+
+    /* ===== 重置 ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===== 矩阵雨背景 ===== */
+    #matrix-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      opacity: 0.1;
+      pointer-events: none;
+    }
+
+    /* ===== 扫描线叠加 ===== */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 65, 0.025) 2px,
+        rgba(0, 255, 65, 0.025) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ===== 主容器 ===== */
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ===== 导航栏 ===== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(15, 25, 35, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+
+    nav .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 56px;
+    }
+
+    .nav-logo {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--green);
+      text-shadow: var(--glow-green);
+      letter-spacing: 2px;
+    }
+
+    .nav-logo span {
+      color: var(--cyan);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .nav-status {
+      display: flex;
+      gap: 20px;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .nav-status .dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: pulse 2s infinite;
+      box-shadow: 0 0 6px var(--green);
+    }
+
+    /* ===== Hero 区域 ===== */
+    .hero {
+      padding-top: 140px;
+      padding-bottom: 80px;
+      text-align: center;
+      position: relative;
+    }
+
+    /* 装饰光晕 */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 80px; left: 50%;
+      transform: translateX(-50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,255,65,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .ascii-art {
+      color: var(--green);
+      font-size: clamp(6px, 1.5vw, 14px);
+      line-height: 1.15;
+      text-shadow: var(--glow-green);
+      white-space: pre;
+      display: inline-block;
+      margin-bottom: 32px;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(16px, 3vw, 28px);
+      color: var(--cyan);
+      text-shadow: var(--glow-cyan);
+      margin-bottom: 16px;
+      animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .hero-desc {
+      font-size: 14px;
+      color: var(--text-dim);
+      max-width: 640px;
+      margin: 0 auto 40px;
+      line-height: 1.8;
+      animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    .hero-desc .highlight {
+      color: var(--green);
+    }
+
+    .hero-cta {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      animation: fadeInUp 0.8s ease-out 0.6s both;
+    }
+
+    .btn-hero {
+      background: transparent;
+      color: var(--green);
+      border: 1px solid var(--green);
+      padding: 12px 32px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s;
+      text-shadow: var(--glow-green);
+      letter-spacing: 1px;
+    }
+
+    .btn-hero:hover {
+      background: var(--green);
+      color: var(--bg);
+      text-shadow: none;
+      box-shadow: 0 0 30px rgba(0,255,65,0.4);
+    }
+
+    .btn-hero.secondary {
+      border-color: var(--text-dim);
+      color: var(--text-dim);
+      text-shadow: none;
+    }
+
+    .btn-hero.secondary:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 20px rgba(0,229,255,0.2);
+    }
+
+    /* ===== 终端装饰 ===== */
+    .terminal-decoration {
+      background: rgba(10, 22, 35, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 20px 24px;
+      max-width: 600px;
+      margin: 60px auto 0;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.8;
+      animation: fadeInUp 0.8s ease-out 0.8s both;
+    }
+
+    .terminal-decoration .prompt {
+      color: var(--green);
+    }
+
+    .terminal-decoration .cmd {
+      color: var(--cyan);
+    }
+
+    .terminal-decoration .output {
+      color: var(--text-dim);
+    }
+
+    .terminal-decoration .blink {
+      animation: blink 1s step-end infinite;
+    }
+
+    /* ===== 分隔符 ===== */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 20px 0 48px;
+      color: var(--text-dim);
+      font-size: 12px;
+      letter-spacing: 3px;
+    }
+
+    .section-divider::before,
+    .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    /* ===== 游戏卡片区域 ===== */
+    .section-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .section-header h2 {
+      font-size: 24px;
+      color: var(--green);
+      text-shadow: var(--glow-green);
+      margin-bottom: 8px;
+    }
+
+    .section-header p {
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 80px;
+    }
+
+    /* ===== 游戏卡片 ===== */
+    .game-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .game-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--card-accent, var(--green)), transparent);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .game-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.03) 0%, transparent 60%);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .game-card:hover {
+      border-color: var(--card-accent, var(--green));
+      transform: translateY(-4px);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 30px var(--card-glow, rgba(0,255,65,0.1));
+    }
+
+    .game-card:hover::before,
+    .game-card:hover::after {
+      opacity: 1;
+    }
+
+    .card-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .card-badge {
+      display: inline-block;
+      font-size: 10px;
+      padding: 3px 10px;
+      border-radius: 3px;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .card-badge.green { background: rgba(0,255,65,0.12); color: var(--green); border: 1px solid rgba(0,255,65,0.3); }
+    .card-badge.cyan { background: rgba(0,229,255,0.12); color: var(--cyan); border: 1px solid rgba(0,229,255,0.3); }
+    .card-badge.red { background: rgba(255,23,68,0.12); color: var(--red); border: 1px solid rgba(255,23,68,0.3); }
+    .card-badge.purple { background: rgba(213,0,249,0.12); color: var(--purple); border: 1px solid rgba(213,0,249,0.3); }
+    .card-badge.yellow { background: rgba(255,214,0,0.12); color: var(--yellow); border: 1px solid rgba(255,214,0,0.3); }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+
+    .card-title-en {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .card-tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border: 1px solid rgba(200,214,229,0.25);
+      border-radius: 3px;
+      color: var(--text-dim);
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-difficulty {
+      display: flex;
+      gap: 3px;
+    }
+
+    .card-difficulty .pip {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(200,214,229,0.15);
+      border: 1px solid rgba(200,214,229,0.3);
+    }
+
+    .card-difficulty .pip.active {
+      background: var(--card-accent, var(--green));
+      border-color: var(--card-accent, var(--green));
+      box-shadow: 0 0 6px var(--card-accent, var(--green));
+    }
+
+    .card-enter {
+      font-size: 12px;
+      color: var(--card-accent, var(--green));
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: all 0.3s;
+    }
+
+    .game-card:hover .card-enter {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ===== 统计区域 ===== */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+      margin-bottom: 80px;
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 32px;
+      font-weight: bold;
+      color: var(--green);
+      text-shadow: var(--glow-green);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* ===== 关于区域 ===== */
+    .about-section {
+      margin-bottom: 80px;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .about-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 24px;
+    }
+
+    .about-card h3 {
+      font-size: 14px;
+      color: var(--cyan);
+      margin-bottom: 12px;
+    }
+
+    .about-card p {
+      font-size: 12px;
+      color: var(--text-dim);
+      line-height: 1.8;
+    }
+
+    .about-card ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .about-card li {
+      font-size: 12px;
+      color: var(--text-dim);
+      padding: 4px 0;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .about-card li::before {
+      content: '>';
+      position: absolute;
+      left: 0;
+      color: var(--green);
+    }
+
+    /* ===== 页脚 ===== */
+    footer {
+      text-align: center;
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 40px;
+    }
+
+    footer .footer-links {
+      margin-top: 8px;
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    footer a {
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    footer a:hover {
+      color: var(--green);
+    }
+
+    /* ===== 动画 ===== */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    @keyframes glitch {
+      0% { clip-path: inset(40% 0 61% 0); transform: translate(-2px, 2px); }
+      20% { clip-path: inset(92% 0 1% 0); transform: translate(2px, -1px); }
+      40% { clip-path: inset(43% 0 1% 0); transform: translate(-1px, 3px); }
+      60% { clip-path: inset(25% 0 58% 0); transform: translate(3px, -2px); }
+      80% { clip-path: inset(54% 0 7% 0); transform: translate(-3px, 1px); }
+      100% { clip-path: inset(58% 0 43% 0); transform: translate(1px, -3px); }
+    }
+
+    .glitch-text {
+      position: relative;
+    }
+
+    .glitch-text::before,
+    .glitch-text::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+
+    .glitch-text::before {
+      color: var(--cyan);
+      animation: glitch 3s infinite linear alternate-reverse;
+      opacity: 0.03;
+    }
+
+    .glitch-text::after {
+      color: var(--red);
+      animation: glitch 2s infinite linear alternate;
+      opacity: 0.03;
+    }
+
+    /* ===== 滚动动画 ===== */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 768px) {
+      .hero { padding-top: 100px; padding-bottom: 60px; }
+      .ascii-art { font-size: 5px; }
+      .games-grid { grid-template-columns: 1fr; }
+      .stats-bar { gap: 24px; }
+      .nav-status { display: none; }
+      .terminal-decoration { margin: 40px 16px 0; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 矩阵雨背景 -->
+  <canvas id="matrix-canvas"></canvas>
+
+  <!-- 导航栏 -->
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-logo">SEC<span>ARENA</span></div>
+      <div class="nav-status">
+        <span><span class="dot"></span>SYSTEM ONLINE</span>
+        <span id="clock"></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="ascii-art glitch-text" data-text="
+  ____  _____ ____  _   _    _    ____  _  ______
+ / ___|| ____/ ___|| | | |  / \  |  _ \| |/ / ___|
+ \___ \|  _|| |    | |_| | / _ \ | |_) | ' /\___ \
+  ___) | |__| |___ |  _  |/ ___ \|  _ <| . \ ___) |
+ |____/|_____\____||_| |_/_/   \_\_| \_\_|\_\____/
+">
+  ____  _____ ____  _   _    _    ____  _  ______
+ / ___|| ____/ ___|| | | |  / \  |  _ \| |/ / ___|
+ \___ \|  _|| |    | |_| | / _ \ | |_) | ' /\___ \
+  ___) | |__| |___ |  _  |/ ___ \|  _ <| . \ ___) |
+ |____/|_____\____||_| |_/_/   \_\_| \_\_|\_\____/
+      </div>
+
+      <div class="hero-subtitle">> 网络安全挑战平台_</div>
+
+      <p class="hero-desc">
+        欢迎来到 <span class="highlight">SecArena</span> —— 一个集合渗透测试、密码破解、
+        暗网追踪、网络防御的沉浸式安全挑战平台。<br>
+        在这里，你将面对真实的攻防场景，提升你的 <span class="highlight">实战安全技能</span>。
+      </p>
+
+      <div class="hero-cta">
+        <a href="#games" class="btn-hero">[ 进入挑战 ]</a>
+        <a href="#about" class="btn-hero secondary">[ 了解更多 ]</a>
+      </div>
+
+      <!-- 终端装饰 -->
+      <div class="terminal-decoration">
+        <div><span class="prompt">root@secarena:~$</span> <span class="cmd">nmap -sV --script=vuln target.local</span></div>
+        <div class="output">Starting Nmap scan...</div>
+        <div class="output">PORT    STATE  SERVICE  VERSION</div>
+        <div class="output">22/tcp  open   ssh      OpenSSH 8.2</div>
+        <div class="output">80/tcp  open   http     Apache/2.4</div>
+        <div class="output">443/tcp open   https    nginx/1.18</div>
+        <div style="margin-top:8px;"><span class="prompt">root@secarena:~$</span> <span class="blink" style="color:var(--green)">_</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 游戏区域 -->
+  <section id="games">
+    <div class="container">
+      <div class="section-divider">CHALLENGES</div>
+
+      <div class="section-header">
+        <h2>// 选择你的战场</h2>
+        <p>每个模块都是一场独立的安全挑战，从不同维度锤炼你的技能</p>
+      </div>
+
+      <div class="games-grid">
+
+        <!-- CyberHack -->
+        <a href="cyberhack/" class="game-card fade-in" style="--card-accent: var(--green); --card-glow: rgba(0,255,65,0.1);">
+          <span class="card-icon">⚡</span>
+          <span class="card-badge green">PENTESTING</span>
+          <div class="card-title">CyberHack</div>
+          <div class="card-title-en">渗透测试模拟器</div>
+          <p class="card-desc">
+            扮演渗透测试工程师，通过终端交互完成信息收集、漏洞扫描、
+            权限提升等任务。体验真实的渗透测试工作流程，获取 flag 证明实力。
+          </p>
+          <div class="card-tags">
+            <span class="card-tag">信息收集</span>
+            <span class="card-tag">漏洞利用</span>
+            <span class="card-tag">权限提升</span>
+            <span class="card-tag">终端操作</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-difficulty">
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip"></span>
+              <span class="pip"></span>
+            </div>
+            <span class="card-enter">进入 →</span>
+          </div>
+        </a>
+
+        <!-- CodeBreaker -->
+        <a href="cipher/" class="game-card fade-in" style="--card-accent: var(--cyan); --card-glow: rgba(0,229,255,0.1);">
+          <span class="card-icon">🔐</span>
+          <span class="card-badge cyan">CRYPTOGRAPHY</span>
+          <div class="card-title">CodeBreaker</div>
+          <div class="card-title-en">密码破解挑战</div>
+          <p class="card-desc">
+            从古典密码到现代加密，逐步挑战你的密码分析能力。
+            凯撒密码、维吉尼亚、AES、RSA……破解每一道密文，揭开隐藏的信息。
+          </p>
+          <div class="card-tags">
+            <span class="card-tag">凯撒密码</span>
+            <span class="card-tag">维吉尼亚</span>
+            <span class="card-tag">AES</span>
+            <span class="card-tag">RSA</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-difficulty">
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip"></span>
+              <span class="pip"></span>
+              <span class="pip"></span>
+            </div>
+            <span class="card-enter">进入 →</span>
+          </div>
+        </a>
+
+        <!-- Darkweb -->
+        <a href="darkweb/" class="game-card fade-in" style="--card-accent: var(--red); --card-glow: rgba(255,23,68,0.1);">
+          <span class="card-icon">🕵️</span>
+          <span class="card-badge red">OSINT</span>
+          <div class="card-title">DarkTrace</div>
+          <div class="card-title-en">暗网交易追踪</div>
+          <p class="card-desc">
+            扮演区块链分析师，追踪加密货币在暗网中的流转路径。
+            从简单直链到混币跨链，分析交易图谱，揭露洗钱网络。
+          </p>
+          <div class="card-tags">
+            <span class="card-tag">区块链分析</span>
+            <span class="card-tag">交易追踪</span>
+            <span class="card-tag">混币识别</span>
+            <span class="card-tag">图分析</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-difficulty">
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip"></span>
+            </div>
+            <span class="card-enter">进入 →</span>
+          </div>
+        </a>
+
+        <!-- Defense -->
+        <a href="defense/" class="game-card fade-in" style="--card-accent: var(--yellow); --card-glow: rgba(255,214,0,0.1);">
+          <span class="card-icon">🛡️</span>
+          <span class="card-badge yellow">DEFENSE</span>
+          <div class="card-title">CyberDefense</div>
+          <div class="card-title-en">网络安全塔防</div>
+          <p class="card-desc">
+            经典塔防玩法 × 网络安全知识。部署防火墙、IDS、WAF 等安全设备，
+            抵御一波又一波的网络攻击，保护核心服务器不被攻破。
+          </p>
+          <div class="card-tags">
+            <span class="card-tag">防火墙</span>
+            <span class="card-tag">入侵检测</span>
+            <span class="card-tag">WAF</span>
+            <span class="card-tag">策略配置</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-difficulty">
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip"></span>
+              <span class="pip"></span>
+              <span class="pip"></span>
+            </div>
+            <span class="card-enter">进入 →</span>
+          </div>
+        </a>
+
+        <!-- LogTracer -->
+        <a href="forensics/" class="game-card fade-in" style="--card-accent: var(--orange); --card-glow: rgba(255,145,0,0.1);">
+          <span class="card-icon">🔍</span>
+          <span class="card-badge" style="background:rgba(255,145,0,0.12);color:var(--orange);border:1px solid rgba(255,145,0,0.3);">FORENSICS</span>
+          <div class="card-title">LogTracer</div>
+          <div class="card-title-en">日志分析挑战</div>
+          <p class="card-desc">
+            扮演 SOC 分析师，从系统日志中发现攻击痕迹。分析暴力破解、
+            SQL 注入、WebShell、横向移动等攻击事件，给出正确的应急响应方案。
+          </p>
+          <div class="card-tags">
+            <span class="card-tag">日志分析</span>
+            <span class="card-tag">应急响应</span>
+            <span class="card-tag">攻击识别</span>
+            <span class="card-tag">SOC 运维</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-difficulty">
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip"></span>
+              <span class="pip"></span>
+            </div>
+            <span class="card-enter">进入 →</span>
+          </div>
+        </a>
+
+        <!-- MalwareLab -->
+        <a href="malware/" class="game-card fade-in" style="--card-accent: #6a1b9a; --card-glow: rgba(106,27,154,0.1);">
+          <span class="card-icon">🔬</span>
+          <span class="card-badge" style="background:rgba(106,27,154,0.12);color:#6a1b9a;border:1px solid rgba(106,27,154,0.3);">MALWARE ANALYSIS</span>
+          <div class="card-title">MalwareLab</div>
+          <div class="card-title-en">恶意软件分析</div>
+          <p class="card-desc">
+            扮演恶意软件分析师，通过静态分析和动态行为分析识别可疑样本。
+            从木马、勒索到无文件攻击，掌握逆向分析与威胁识别的核心技能。
+          </p>
+          <div class="card-tags">
+            <span class="card-tag">静态分析</span>
+            <span class="card-tag">沙箱行为</span>
+            <span class="card-tag">恶意类型判定</span>
+            <span class="card-tag">威胁处置</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-difficulty">
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip"></span>
+            </div>
+            <span class="card-enter">进入 →</span>
+          </div>
+        </a>
+
+        <!-- IncidentResp -->
+        <a href="incident/" class="game-card fade-in" style="--card-accent: var(--orange); --card-glow: rgba(255,145,0,0.1);">
+          <span class="card-icon">🚨</span>
+          <span class="card-badge" style="background:rgba(255,145,0,0.12);color:var(--orange);border:1px solid rgba(255,145,0,0.3);">INCIDENT RESPONSE</span>
+          <div class="card-title">IncidentResp</div>
+          <div class="card-title-en">安全事件应急响应</div>
+          <p class="card-desc">
+            扮演 SOC 分析师，面对突发安全事件。从暴力破解到 APT 高级入侵，
+            完成事件分级、调查分析、威胁遏制和恢复处置的全流程。
+          </p>
+          <div class="card-tags">
+            <span class="card-tag">事件分级</span>
+            <span class="card-tag">应急处置</span>
+            <span class="card-tag">威胁遏制</span>
+            <span class="card-tag">安全运维</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-difficulty">
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip"></span>
+            </div>
+            <span class="card-enter">进入 →</span>
+          </div>
+        </a>
+
+        <!-- NetBuilder -->
+        <a href="netbuilder/" class="game-card fade-in" style="--card-accent: #f9a825; --card-glow: rgba(249,168,37,0.1);">
+          <span class="card-icon">🏗️</span>
+          <span class="card-badge" style="background:rgba(249,168,37,0.12);color:#f9a825;border:1px solid rgba(249,168,37,0.3);">SANDBOX</span>
+          <div class="card-title">NetBuilder</div>
+          <div class="card-title-en">网络攻防沙盒</div>
+          <p class="card-desc">
+            拖拽搭建网络拓扑，配置防火墙、IDS等安全设备，
+            然后模拟攻击测试你的防御体系。自由度极高的沙盒玩法。
+          </p>
+          <div class="card-tags">
+            <span class="card-tag">拖拽搭建</span>
+            <span class="card-tag">设备配置</span>
+            <span class="card-tag">攻防模拟</span>
+            <span class="card-tag">自由沙盒</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-difficulty">
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip"></span>
+              <span class="pip"></span>
+              <span class="pip"></span>
+            </div>
+            <span class="card-enter">进入 →</span>
+          </div>
+        </a>
+
+        <!-- HackQuest -->
+        <a href="hackquest/" class="game-card fade-in" style="--card-accent: var(--green); --card-glow: rgba(0,255,65,0.1);">
+          <span class="card-icon">🗺️</span>
+          <span class="card-badge green">ADVENTURE</span>
+          <div class="card-title">HackQuest</div>
+          <div class="card-title-en">黑客探险</div>
+          <p class="card-desc">
+            RPG风格的黑客探险，在虚拟网络中探索节点、收集工具和信息，
+            选择渗透路径入侵系统。多种通关方式，高自由度。
+          </p>
+          <div class="card-tags">
+            <span class="card-tag">地图探索</span>
+            <span class="card-tag">工具收集</span>
+            <span class="card-tag">多路径</span>
+            <span class="card-tag">高自由度</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-difficulty">
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip active"></span>
+              <span class="pip"></span>
+            </div>
+            <span class="card-enter">进入 →</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 统计 -->
+  <section>
+    <div class="container">
+      <div class="stats-bar fade-in">
+        <div class="stat-item">
+          <div class="stat-num" data-target="9">0</div>
+          <div class="stat-label">挑战模块</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-target="42">0</div>
+          <div class="stat-label">关卡总数</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-target="6">0</div>
+          <div class="stat-label">安全领域</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-target="1">0</div>
+          <div class="stat-label">目标：成为安全工程师</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 关于 -->
+  <section id="about" class="about-section">
+    <div class="container">
+      <div class="section-divider">ABOUT</div>
+
+      <div class="section-header">
+        <h2>// 关于平台</h2>
+        <p>通过游戏化的方式学习网络安全</p>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-card fade-in">
+          <h3>🎯 学习目标</h3>
+          <p>SecArena 覆盖网络安全的核心领域，让你在实践中掌握以下技能：</p>
+          <ul>
+            <li>渗透测试方法论与工具链</li>
+            <li>密码学基础与密码分析</li>
+            <li>区块链分析与链上追踪</li>
+            <li>网络防御策略与设备配置</li>
+            <li>数据包分析与流量过滤</li>
+          </ul>
+        </div>
+        <div class="about-card fade-in">
+          <h3>⚡ 特色</h3>
+          <p>每一个挑战模块都经过精心设计：</p>
+          <ul>
+            <li>渐进式难度，从入门到进阶</li>
+            <li>融入真实安全场景与案例</li>
+            <li>即时反馈与知识卡片</li>
+            <li>无需搭建环境，浏览器即可体验</li>
+            <li>完全免费，无广告无注册</li>
+          </ul>
+        </div>
+        <div class="about-card fade-in">
+          <h3>📋 使用说明</h3>
+          <p>开始前请阅读以下提示：</p>
+          <ul>
+            <li>点击上方卡片进入对应挑战</li>
+            <li>每个模块独立，可任意顺序游玩</li>
+            <li>遇到困难可使用提示功能</li>
+            <li>建议在桌面端获得最佳体验</li>
+            <li>所有内容仅供学习，请勿用于非法用途</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer>
+    <div class="container">
+      <div>SecArena - 网络安全挑战平台 | 仅供学习交流</div>
+      <div class="footer-links">
+        <a href="#games">挑战入口</a>
+        <a href="#about">关于平台</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ===== 矩阵雨 =====
+    (function() {
+      const canvas = document.getElementById('matrix-canvas');
+      const ctx = canvas.getContext('2d');
+      let cols, drops;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        cols = Math.floor(canvas.width / 16);
+        drops = Array(cols).fill(1);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+
+      function draw() {
+        ctx.fillStyle = 'rgba(15, 25, 35, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#00ff41';
+        ctx.font = '14px monospace';
+
+        for (let i = 0; i < cols; i++) {
+          const ch = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(ch, i * 16, drops[i] * 16);
+          if (drops[i] * 16 > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
+      }
+
+      setInterval(draw, 50);
+    })();
+
+    // ===== 时钟 =====
+    (function() {
+      const el = document.getElementById('clock');
+      function tick() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        el.textContent = h + ':' + m + ':' + s;
+      }
+      tick();
+      setInterval(tick, 1000);
+    })();
+
+    // ===== 数字递增动画 =====
+    (function() {
+      const nums = document.querySelectorAll('.stat-num[data-target]');
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            const target = parseInt(el.dataset.target);
+            let current = 0;
+            const step = Math.max(1, Math.floor(target / 30));
+            const timer = setInterval(function() {
+              current += step;
+              if (current >= target) {
+                current = target;
+                clearInterval(timer);
+              }
+              el.textContent = current;
+            }, 30);
+            observer.unobserve(el);
+          }
+        });
+      }, { threshold: 0.5 });
+
+      nums.forEach(function(n) { observer.observe(n); });
+    })();
+
+    // ===== 滚动渐入 =====
+    (function() {
+      const items = document.querySelectorAll('.fade-in');
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+      items.forEach(function(el, i) {
+        el.style.transitionDelay = (i % 4) * 0.1 + 's';
+        observer.observe(el);
+      });
+    })();
+
+    // ===== 卡片鼠标光晕 =====
+    document.querySelectorAll('.game-card').forEach(function(card) {
+      card.addEventListener('mousemove', function(e) {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+        const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+        card.style.setProperty('--mouse-x', x + '%');
+        card.style.setProperty('--mouse-y', y + '%');
+      });
+    });
+  </script>
+
+</body>
+</html>

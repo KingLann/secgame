@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HackQuest - 黑客探险</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="toast" class="toast"></div>
+
+    <!-- 开始界面 -->
+    <div id="start-screen" class="screen active">
+      <div style="text-align:center;">
+        <div class="logo-icon">🗺️</div>
+        <h1>HackQuest</h1>
+        <p class="tagline">黑客探险</p>
+        <p class="sub">
+          在虚拟网络世界中探索、发现漏洞、入侵系统<br>
+          收集工具和信息，选择你的渗透路径，获取所有 flag
+        </p>
+        <button id="start-btn" class="btn primary">[ 开始探险 ]</button>
+      </div>
+    </div>
+
+    <!-- 关卡选择 -->
+    <div id="levels-screen" class="screen">
+      <header>
+        <div><h2>🗺️ 选择地图</h2></div>
+        <div><span class="header-stats">🏆 <strong id="total-score">0</strong></span></div>
+      </header>
+      <div id="level-grid"></div>
+    </div>
+
+    <!-- 游戏界面 -->
+    <div id="game-screen" class="screen">
+      <header>
+        <button id="back-btn" class="btn sm">← 返回</button>
+        <span id="level-title"></span>
+        <span id="level-difficulty"></span>
+      </header>
+
+      <!-- 目标栏 -->
+      <div class="goal-bar" id="goal-bar"></div>
+
+      <div class="game-body">
+        <!-- 左侧地图 -->
+        <div class="map-area" id="map-area">
+          <svg class="map-edges" id="map-edges"></svg>
+        </div>
+
+        <!-- 右侧面板 -->
+        <div class="side-panel">
+          <div class="system-info" id="system-info">
+            <h4>📋 选择一个节点开始探索</h4>
+            <div class="sys-desc">点击地图上的节点查看系统信息和可用操作</div>
+          </div>
+          <div class="inventory-panel" id="inventory-panel">
+            <h4>🎒 背包</h4>
+            <div id="inventory-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 操作结果弹窗 -->
+    <div id="result-overlay" class="result-overlay hidden">
+      <div class="result-box">
+        <h3 id="result-title"></h3>
+        <div class="result-output" id="result-output"></div>
+        <div class="result-items" id="result-items"></div>
+        <div style="text-align:center;">
+          <button id="result-close-btn" class="btn primary">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 完成弹窗 -->
+    <div id="complete-overlay" class="complete-overlay hidden">
+      <div class="complete-box">
+        <h2 id="complete-title"></h2>
+        <p id="complete-msg"></p>
+        <div id="complete-stars"></div>
+        <div class="knowledge-card">
+          <div class="knowledge-title" id="knowledge-title"></div>
+          <div class="knowledge-body" id="knowledge-body"></div>
+        </div>
+        <div class="modal-btns">
+          <button id="replay-btn" class="btn">重新挑战</button>
+          <button id="next-level-btn" class="btn primary">下一关 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

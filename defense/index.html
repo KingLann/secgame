@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberDefense - 网络安全塔防</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 顶部信息栏 -->
+    <header id="header">
+      <span class="logo"><button id="back-to-menu-btn" class="header-btn" title="返回选关">◀ 选关</button> 🛡️ CyberDefense</span>
+      <div class="header-info">
+        <span>❤️ <span id="lives">20</span></span>
+        <span>💰 <span id="credits">200</span></span>
+        <span>🌊 波次: <span id="wave-num">0</span>/<span id="wave-total">0</span></span>
+        <span>🏆 <span id="score">0</span></span>
+      </div>
+    </header>
+
+    <!-- 主区域 -->
+    <div id="main">
+      <!-- 左侧：建造面板 -->
+      <aside id="build-panel">
+        <h3>🔧 防御工具</h3>
+        <div id="tower-list"></div>
+        <div id="tower-info">
+          <p class="hint">点击选择，再点击地图放置</p>
+        </div>
+      </aside>
+
+      <!-- 中间：游戏画布 -->
+      <div id="canvas-wrapper">
+        <canvas id="game-canvas"></canvas>
+        <!-- 开始/下一波按钮 -->
+        <button id="start-btn" class="game-btn">▶ 开始防御</button>
+        <button id="next-wave-btn" class="game-btn hidden">▶ 下一波</button>
+      </div>
+
+      <!-- 右侧：信息面板 -->
+      <aside id="info-panel">
+        <h3>📋 关卡信息</h3>
+        <div id="level-info"></div>
+        <h3>📖 敌人图鉴</h3>
+        <div id="enemy-guide"></div>
+      </aside>
+    </div>
+
+    <!-- 关卡选择 -->
+    <div id="level-select" class="overlay">
+      <div class="overlay-content">
+        <h2>🛡️ CyberDefense</h2>
+        <p>网络安全塔防 — 保护你的服务器！</p>
+        <div id="level-buttons"></div>
+      </div>
+    </div>
+
+    <!-- 游戏结束 -->
+    <div id="game-over" class="overlay hidden">
+      <div class="overlay-content">
+        <h2 id="game-over-title">💀 防线失守</h2>
+        <p id="game-over-msg"></p>
+        <div id="game-over-stats"></div>
+        <button id="retry-btn" class="game-btn">🔄 重试</button>
+        <button id="back-btn" class="game-btn secondary">📋 选关</button>
+      </div>
+    </div>
+
+    <!-- 胜利 -->
+    <div id="victory" class="overlay hidden">
+      <div class="overlay-content">
+        <h2>🎉 防御成功！</h2>
+        <p id="victory-msg"></p>
+        <div id="victory-stats"></div>
+        <button id="victory-next-btn" class="game-btn">▶ 下一关</button>
+        <button id="victory-back-btn" class="game-btn secondary">📋 选关</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/audio.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
